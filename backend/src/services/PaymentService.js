@@ -1,6 +1,6 @@
 // Import necessary modules
 const Razorpay = require('razorpay');
-const stripe = require('stripe')('REDACTED_STRIPE_SECRET');
+const stripe = require('stripe')(process.env.STRIPE_SECRET || '');
 const PaymentOrder = require('../models/PaymentOrder'); // Assuming you have Mongoose models defined
 const Order = require('../models/Order');
 const User = require('../models/User');
@@ -71,10 +71,13 @@ class PaymentService {
     }
 
     async createRazorpayPaymentLink(user, amount, orderId) {
-        apiKey="REDACTED_RAZORPAY_KEY"
-        apiSecret="REDACTED_RAZORPAY_SECRET"
-        
-        
+        const apiKey = process.env.RAZORPAY_KEY || '';
+        const apiSecret = process.env.RAZORPAY_SECRET || '';
+
+        if (!apiKey || !apiSecret) {
+            throw new Error('Razorpay credentials are not configured in environment variables');
+        }
+
         const razorpays = new Razorpay({
             key_id: apiKey,
             key_secret: apiSecret,
